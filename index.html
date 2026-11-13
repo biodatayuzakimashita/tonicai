@@ -56,7 +56,7 @@ textarea::placeholder{color:#737386}
 .upload img{max-width:100%;max-height:180px;border-radius:8px}
 .upload strong{color:#c4adff}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-select,input[type=number]{
+select,input[type=number],input[type=text]{
  width:100%;background:#11111a;color:white;
  border:1px solid #343445;border-radius:10px;
  padding:12px;outline:none;font-size:13px
@@ -108,8 +108,8 @@ footer{text-align:center;color:#646477;font-size:11px;margin-top:35px}
  <div class="brand">
   <div class="logo">✳</div>
   <div>
-   <div class="brand-name">TONIC AI</div>
-   <div class="sub">IMAGE STUDIO</div>
+   <div class="brand-name">YUZA AI</div>
+   <div class="sub">Hytamkan semuanya</div>
   </div>
  </div>
  <div class="status">● Private Studio</div>
@@ -127,12 +127,6 @@ footer{text-align:center;color:#646477;font-size:11px;margin-top:35px}
  </div>
 
  <div class="field">
-  <label class="label" for="negative">Negative prompt</label>
-  <textarea id="negative" style="min-height:70px"
-   placeholder="Things you want to avoid..."></textarea>
- </div>
-
- <div class="field">
   <label class="label">Reference image</label>
   <label class="upload" for="reference">
    <span id="uploadText">＋</span>
@@ -145,21 +139,23 @@ footer{text-align:center;color:#646477;font-size:11px;margin-top:35px}
  <div class="grid field">
   <div>
    <label class="label" for="ratio">Aspect ratio</label>
-   <select id="ratio">
-    <option value="1:1">1:1 Square</option>
-    <option value="3:4">3:4 Portrait</option>
-    <option value="9:16" selected>9:16 Story</option>
-    <option value="16:9">16:9 Landscape</option>
-   </select>
+   <input id="ratio" type="text" value="9:16"
+    placeholder="Contoh: 9:19">
   </div>
   <div>
-   <label class="label" for="resolution">Resolution</label>
-   <select id="resolution">
-    <option value="512">512 px</option>
-    <option value="768" selected>768 px</option>
-    <option value="1024">1024 px</option>
+   <label class="label" for="quality">Image quality</label>
+   <select id="quality">
+    <option value="1024">1K</option>
+    <option value="2048" selected>2K</option>
+    <option value="4096">4K</option>
    </select>
   </div>
+ </div>
+
+ <div class="field">
+  <label class="label">Calculated resolution</label>
+  <input id="resolutionPreview" type="text"
+   value="1152 × 2048 px" readonly>
  </div>
 
  <div class="field">
@@ -207,6 +203,54 @@ const $ = id => document.getElementById(id);
 let referenceFile = null;
 let currentImageURL = null;
 let galleryURLs = [];
+
+function calculateResolution() {
+ const ratioText = $("ratio").value.trim();
+ const quality = Number($("quality").value);
+
+ const match = ratioText.match(
+  /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/
+ );
+
+ if (!match) {
+  $("resolutionPreview").value = "Invalid aspect ratio";
+  return null;
+ }
+
+ const ratioWidth = Number(match[1]);
+ const ratioHeight = Number(match[2]);
+
+ if (
+  !Number.isFinite(ratioWidth) ||
+  !Number.isFinite(ratioHeight) ||
+  ratioWidth <= 0 ||
+  ratioHeight <= 0 ||
+  ratioWidth > 10000 ||
+  ratioHeight > 10000
+ ) {
+  $("resolutionPreview").value = "Invalid aspect ratio";
+  return null;
+ }
+
+ // Quality represents the maximum side in pixels.
+ const scale = quality / Math.max(ratioWidth, ratioHeight);
+
+ // Round dimensions to multiples of 8 for model compatibility.
+ const width = Math.max(
+  64, Math.round(ratioWidth * scale / 8) * 8
+ );
+ const height = Math.max(
+  64, Math.round(ratioHeight * scale / 8) * 8
+ );
+
+ $("resolutionPreview").value = `${width} × ${height} px`;
+
+ return { width, height, ratio: ratioText };
+}
+
+$("ratio").addEventListener("input", calculateResolution);
+$("quality").addEventListener("change", calculateResolution);
+calculateResolution();
 
 $("reference").addEventListener("change", e => {
  referenceFile = e.target.files[0] || null;
@@ -279,6 +323,13 @@ $("generate").addEventListener("click", async () => {
   return;
  }
 
+ const dimensions = calculateResolution();
+
+ if (!dimensions) {
+  alert("Masukkan aspect ratio yang valid, contoh 9:19.");
+  return;
+ }
+
  if (API_URL === "YOUR_BACKEND_URL") {
   alert("Backend AI belum terhubung. Kita akan memasangnya pada tahap berikutnya.");
   return;
@@ -292,9 +343,11 @@ $("generate").addEventListener("click", async () => {
  try {
   const form = new FormData();
   form.append("prompt", prompt);
-  form.append("negative_prompt", $("negative").value);
-  form.append("ratio", $("ratio").value);
-  form.append("resolution", $("resolution").value);
+  form.append("ratio", dimensions.ratio);
+  form.append("width", dimensions.width);
+  form.append("height", dimensions.height);
+  form.append("resolution", `${dimensions.width}x${dimensions.height}`);
+  form.append("quality", $("quality").value);
   form.append("count", $("count").value);
 
   if (referenceFile) form.append("reference", referenceFile);
