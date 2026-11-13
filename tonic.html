@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TONIC AI — Image Studio</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#101018;color:#f5f5fa;
+ font-family:Arial,Helvetica,sans-serif;
+}
+button,input,textarea,select{font:inherit}
+.app{max-width:850px;margin:auto;padding:22px 16px 50px}
+header{display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:11px}
+.logo{
+ width:40px;height:40px;border-radius:12px;
+ background:#8052e8;display:grid;place-items:center;
+ font-size:22px;font-weight:bold
+}
+.brand-name{font-size:17px;font-weight:700}
+.sub{font-size:11px;color:#9292a4;margin-top:4px}
+.status{
+ font-size:11px;color:#9de6b1;background:#183126;
+ padding:8px 12px;border-radius:20px
+}
+.hero{margin:35px 0 23px}
+h1{font-size:30px;margin:0 0 9px;letter-spacing:-1px}
+.hero p{color:#9292a4;font-size:13px;margin:0}
+.panel{
+ background:#191923;border:1px solid #292938;
+ border-radius:17px;padding:19px;margin-bottom:20px
+}
+.label{font-size:13px;font-weight:600;display:block;margin-bottom:10px}
+textarea{
+ width:100%;min-height:115px;resize:vertical;
+ border:1px solid #343445;background:#11111a;
+ color:white;border-radius:11px;padding:14px;
+ outline:none;font-size:13px;line-height:1.6
+}
+textarea:focus,input:focus,select:focus{
+ border-color:#946bff
+}
+textarea::placeholder{color:#737386}
+.field{margin-bottom:20px}
+.upload{
+ display:flex;align-items:center;justify-content:center;
+ flex-direction:column;gap:9px;min-height:110px;
+ border:1px dashed #51516a;border-radius:12px;
+ background:#13131d;cursor:pointer;color:#aaaabd;
+ font-size:12px;overflow:hidden;padding:12px
+}
+.upload input{display:none}
+.upload img{max-width:100%;max-height:180px;border-radius:8px}
+.upload strong{color:#c4adff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+select,input[type=number]{
+ width:100%;background:#11111a;color:white;
+ border:1px solid #343445;border-radius:10px;
+ padding:12px;outline:none;font-size:13px
+}
+.generate{
+ width:100%;padding:15px;border:0;border-radius:11px;
+ background:linear-gradient(110deg,#7042db,#9665f4);
+ color:white;font-weight:700;cursor:pointer;
+ display:flex;justify-content:center;align-items:center;gap:9px
+}
+.generate:disabled{opacity:.55;cursor:wait}
+.note{font-size:11px;color:#858598;line-height:1.6;margin-top:12px}
+.result-head,.section-head{
+ display:flex;align-items:center;justify-content:space-between;
+ margin:25px 0 13px
+}
+h2{font-size:16px;margin:0}
+.muted{font-size:11px;color:#858598}
+.result{
+ min-height:130px;border:1px dashed #383849;
+ border-radius:14px;background:#191923;
+ display:flex;align-items:center;justify-content:center;
+ overflow:hidden;padding:14px
+}
+.result img{width:100%;height:auto;border-radius:9px}
+.empty{text-align:center;color:#858598;font-size:12px;line-height:1.8}
+.download{
+ display:none;width:100%;padding:13px;margin-top:12px;
+ border:1px solid #45405e;border-radius:10px;
+ background:#242033;color:#d9c9ff;font-weight:600;
+ cursor:pointer
+}
+.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.gallery-item{background:#191923;border-radius:12px;overflow:hidden}
+.gallery-item img{width:100%;display:block;aspect-ratio:3/4;object-fit:cover}
+.gallery-item div{padding:10px;font-size:11px;color:#aaaabd}
+footer{text-align:center;color:#646477;font-size:11px;margin-top:35px}
+@media(min-width:650px){
+ .app{padding:30px 24px 60px}
+ h1{font-size:37px}
+ .gallery{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<main class="app">
+
+<header>
+ <div class="brand">
+  <div class="logo">✳</div>
+  <div>
+   <div class="brand-name">TONIC AI</div>
+   <div class="sub">IMAGE STUDIO</div>
+  </div>
+ </div>
+ <div class="status">● Private Studio</div>
+</header>
+
+<section class="hero">
+ <h1>Create your image.</h1>
+ <p>Turn your imagination into photorealistic images.</p>
+</section>
+
+<section class="panel">
+ <div class="field">
+  <label class="label" for="prompt">Prompt</label>
+  <textarea id="prompt" placeholder="Describe the image you want to create..."></textarea>
+ </div>
+
+ <div class="field">
+  <label class="label" for="negative">Negative prompt</label>
+  <textarea id="negative" style="min-height:70px"
+   placeholder="Things you want to avoid..."></textarea>
+ </div>
+
+ <div class="field">
+  <label class="label">Reference image</label>
+  <label class="upload" for="reference">
+   <span id="uploadText">＋</span>
+   <strong id="uploadLabel">Upload reference photo</strong>
+   <span>JPG, PNG or WEBP</span>
+   <input id="reference" type="file" accept="image/png,image/jpeg,image/webp">
+  </label>
+ </div>
+
+ <div class="grid field">
+  <div>
+   <label class="label" for="ratio">Aspect ratio</label>
+   <select id="ratio">
+    <option value="1:1">1:1 Square</option>
+    <option value="3:4">3:4 Portrait</option>
+    <option value="9:16" selected>9:16 Story</option>
+    <option value="16:9">16:9 Landscape</option>
+   </select>
+  </div>
+  <div>
+   <label class="label" for="resolution">Resolution</label>
+   <select id="resolution">
+    <option value="512">512 px</option>
+    <option value="768" selected>768 px</option>
+    <option value="1024">1024 px</option>
+   </select>
+  </div>
+ </div>
+
+ <div class="field">
+  <label class="label" for="count">Number of images</label>
+  <select id="count">
+   <option value="1">1 image</option>
+   <option value="2">2 images</option>
+   <option value="3">3 images</option>
+   <option value="4">4 images</option>
+  </select>
+ </div>
+
+ <button class="generate" id="generate">
+  ✨ Generate Image
+ </button>
+ <div class="note">
+  Generation availability depends on the connected AI server
+  and its daily GPU allowance.
+ </div>
+</section>
+
+<div class="result-head">
+ <h2>Generated result</h2>
+ <span class="muted" id="resultStatus">Waiting for generation</span>
+</div>
+<div class="result" id="result">
+ <div class="empty">✧<br>Your generated image will appear here.</div>
+</div>
+<button class="download" id="download">↓ Download image</button>
+
+<div class="section-head">
+ <h2>Recent creations</h2>
+ <span class="muted">This session</span>
+</div>
+<div class="gallery" id="gallery"></div>
+
+<footer>TONIC AI · Private Image Studio</footer>
+</main>
+
+<script>
+// Isi alamat backend setelah server AI selesai dibuat.
+const API_URL = "YOUR_BACKEND_URL";
+
+const $ = id => document.getElementById(id);
+let referenceFile = null;
+let currentImageURL = null;
+let galleryURLs = [];
+
+$("reference").addEventListener("change", e => {
+ referenceFile = e.target.files[0] || null;
+ if (!referenceFile) return;
+
+ const reader = new FileReader();
+ reader.onload = () => {
+  $("uploadText").innerHTML =
+   `<img src="${reader.result}" alt="Reference preview">`;
+  $("uploadLabel").textContent = referenceFile.name;
+ };
+ reader.readAsDataURL(referenceFile);
+});
+
+async function getImage(response) {
+ const type = response.headers.get("content-type") || "";
+
+ if (type.includes("application/json")) {
+  const data = await response.json();
+  if (!data.image_url) throw new Error("Server tidak mengirim image_url.");
+  const imageResponse = await fetch(data.image_url);
+  if (!imageResponse.ok) throw new Error("Gagal mengambil gambar.");
+  return imageResponse.blob();
+ }
+
+ return response.blob();
+}
+
+function showImage(blob) {
+ const url = URL.createObjectURL(blob);
+ currentImageURL = url;
+
+ $("result").innerHTML = "";
+ const img = document.createElement("img");
+ img.src = url;
+ img.alt = "Generated image";
+ $("result").appendChild(img);
+
+ $("download").style.display = "block";
+ $("download").onclick = () => downloadImage(url);
+
+ galleryURLs.push(url);
+ const item = document.createElement("div");
+ item.className = "gallery-item";
+ const thumb = document.createElement("img");
+ thumb.src = url;
+ thumb.alt = "Generated image";
+ const caption = document.createElement("div");
+ caption.textContent = "Generated image";
+ item.append(thumb, caption);
+ $("gallery").prepend(item);
+
+ downloadImage(url);
+}
+
+function downloadImage(url) {
+ const a = document.createElement("a");
+ a.href = url;
+ a.download = `tonic-ai-${Date.now()}.png`;
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+}
+
+$("generate").addEventListener("click", async () => {
+ const prompt = $("prompt").value.trim();
+
+ if (!prompt) {
+  alert("Masukkan prompt terlebih dahulu.");
+  return;
+ }
+
+ if (API_URL === "YOUR_BACKEND_URL") {
+  alert("Backend AI belum terhubung. Kita akan memasangnya pada tahap berikutnya.");
+  return;
+ }
+
+ const button = $("generate");
+ button.disabled = true;
+ button.textContent = "Generating...";
+ $("resultStatus").textContent = "Processing...";
+
+ try {
+  const form = new FormData();
+  form.append("prompt", prompt);
+  form.append("negative_prompt", $("negative").value);
+  form.append("ratio", $("ratio").value);
+  form.append("resolution", $("resolution").value);
+  form.append("count", $("count").value);
+
+  if (referenceFile) form.append("reference", referenceFile);
+
+  const response = await fetch(API_URL + "/generate", {
+   method: "POST",
+   body: form
+  });
+
+  if (!response.ok) {
+   throw new Error("Server AI error: " + response.status);
+  }
+
+  const blob = await getImage(response);
+  if (!blob.type.startsWith("image/")) {
+   throw new Error("Format hasil bukan gambar.");
+  }
+
+  showImage(blob);
+  $("resultStatus").textContent = "Completed";
+ } catch (error) {
+  alert("Generate gagal: " + error.message);
+  $("resultStatus").textContent = "Failed";
+ } finally {
+  button.disabled = false;
+  button.innerHTML = "✨ Generate Image";
+ }
+});
+</script>
+</body>
+</html>
