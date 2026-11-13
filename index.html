@@ -4,14 +4,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101018">
 <title>TONIC AI — Image Studio</title>
+
 <style>
 *{box-sizing:border-box}
 body{
  margin:0;background:#101018;color:#f5f5fa;
- font-family:Arial,Helvetica,sans-serif;
+ font-family:Arial,Helvetica,sans-serif
 }
 button,input,textarea,select{font:inherit}
+button{cursor:pointer}
 .app{max-width:850px;margin:auto;padding:22px 16px 50px}
 header{display:flex;align-items:center;justify-content:space-between}
 .brand{display:flex;align-items:center;gap:11px}
@@ -40,11 +43,16 @@ textarea{
  color:white;border-radius:11px;padding:14px;
  outline:none;font-size:13px;line-height:1.6
 }
-textarea:focus,input:focus,select:focus{
- border-color:#946bff
-}
+textarea:focus,input:focus,select:focus{border-color:#946bff}
 textarea::placeholder{color:#737386}
 .field{margin-bottom:20px}
+.presets{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.chip{
+ padding:8px 11px;border-radius:20px;
+ border:1px solid #39364c;background:#211e2e;
+ color:#cdbbff;font-size:11px
+}
+.chip:active{background:#493477}
 .upload{
  display:flex;align-items:center;justify-content:center;
  flex-direction:column;gap:9px;min-height:110px;
@@ -55,20 +63,39 @@ textarea::placeholder{color:#737386}
 .upload input{display:none}
 .upload img{max-width:100%;max-height:180px;border-radius:8px}
 .upload strong{color:#c4adff}
+.ref-tools{display:none;gap:8px;margin-top:9px}
+.small-btn{
+ border:1px solid #45405e;border-radius:9px;
+ background:#242033;color:#d9c9ff;
+ padding:9px 12px;font-size:11px
+}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-select,input[type=number],input[type=text]{
+input[type=text],input[type=number],select{
  width:100%;background:#11111a;color:white;
  border:1px solid #343445;border-radius:10px;
  padding:12px;outline:none;font-size:13px
 }
+input[readonly]{color:#c5b4f5;background:#171522}
+.hint{font-size:10px;color:#858598;line-height:1.6;margin-top:7px}
+.resolution-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .generate{
  width:100%;padding:15px;border:0;border-radius:11px;
  background:linear-gradient(110deg,#7042db,#9665f4);
- color:white;font-weight:700;cursor:pointer;
+ color:white;font-weight:700;
  display:flex;justify-content:center;align-items:center;gap:9px
 }
 .generate:disabled{opacity:.55;cursor:wait}
 .note{font-size:11px;color:#858598;line-height:1.6;margin-top:12px}
+.progress-wrap{display:none;margin-top:15px}
+.progress-top{display:flex;justify-content:space-between;gap:10px;
+ font-size:11px;color:#b9b0cf;margin-bottom:8px}
+.progress{
+ height:6px;border-radius:10px;background:#30303e;overflow:hidden
+}
+.progress-bar{
+ height:100%;width:0;background:#9869ff;
+ transition:width .25s
+}
 .result-head,.section-head{
  display:flex;align-items:center;justify-content:space-between;
  margin:25px 0 13px
@@ -76,31 +103,58 @@ select,input[type=number],input[type=text]{
 h2{font-size:16px;margin:0}
 .muted{font-size:11px;color:#858598}
 .result{
- min-height:130px;border:1px dashed #383849;
+ min-height:150px;border:1px dashed #383849;
  border-radius:14px;background:#191923;
  display:flex;align-items:center;justify-content:center;
  overflow:hidden;padding:14px
 }
-.result img{width:100%;height:auto;border-radius:9px}
-.empty{text-align:center;color:#858598;font-size:12px;line-height:1.8}
-.download{
- display:none;width:100%;padding:13px;margin-top:12px;
- border:1px solid #45405e;border-radius:10px;
- background:#242033;color:#d9c9ff;font-weight:600;
- cursor:pointer
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.result-card{min-width:0}
+.result-card img{
+ width:100%;display:block;border-radius:9px;
+ cursor:zoom-in
 }
+.image-actions{display:flex;gap:6px;margin-top:7px}
+.image-actions button{flex:1}
+.empty{text-align:center;color:#858598;font-size:12px;line-height:1.8}
 .gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .gallery-item{background:#191923;border-radius:12px;overflow:hidden}
-.gallery-item img{width:100%;display:block;aspect-ratio:3/4;object-fit:cover}
+.gallery-item img{
+ width:100%;display:block;aspect-ratio:3/4;
+ object-fit:cover;cursor:zoom-in
+}
 .gallery-item div{padding:10px;font-size:11px;color:#aaaabd}
+.clear-history{
+ border:0;background:transparent;color:#bba5f5;
+ font-size:11px;padding:5px
+}
 footer{text-align:center;color:#646477;font-size:11px;margin-top:35px}
+.modal{
+ display:none;position:fixed;inset:0;z-index:20;
+ background:rgba(0,0,0,.94);
+ align-items:center;justify-content:center;padding:16px
+}
+.modal.open{display:flex}
+.modal-content{max-width:900px;width:100%;text-align:center}
+.modal img{max-width:100%;max-height:78vh;object-fit:contain;border-radius:10px}
+.modal-close{
+ position:absolute;right:18px;top:15px;
+ border:0;background:#292535;color:white;
+ border-radius:50%;width:40px;height:40px;font-size:20px
+}
+.modal-download{margin-top:12px}
 @media(min-width:650px){
  .app{padding:30px 24px 60px}
  h1{font-size:37px}
  .gallery{grid-template-columns:repeat(3,1fr)}
 }
+@media(max-width:420px){
+ .panel{padding:15px}
+ .grid{gap:9px}
+}
 </style>
 </head>
+
 <body>
 <main class="app">
 
@@ -121,9 +175,20 @@ footer{text-align:center;color:#646477;font-size:11px;margin-top:35px}
 </section>
 
 <section class="panel">
+
  <div class="field">
   <label class="label" for="prompt">Prompt</label>
-  <textarea id="prompt" placeholder="Describe the image you want to create..."></textarea>
+  <textarea id="prompt"
+   placeholder="Describe the image you want to create..."></textarea>
+
+  <div class="presets">
+   <button class="chip" data-preset="realistic">Realistic</button>
+   <button class="chip" data-preset="cinematic">Cinematic</button>
+   <button class="chip" data-preset="portrait">Portrait</button>
+   <button class="chip" data-preset="selfie">Selfie</button>
+   <button class="chip" data-preset="studio">Studio</button>
+  </div>
+  <div class="hint">Pilih gaya untuk menambahkan arahan ke prompt.</div>
  </div>
 
  <div class="field">
@@ -131,31 +196,51 @@ footer{text-align:center;color:#646477;font-size:11px;margin-top:35px}
   <label class="upload" for="reference">
    <span id="uploadText">＋</span>
    <strong id="uploadLabel">Upload reference photo</strong>
-   <span>JPG, PNG or WEBP</span>
-   <input id="reference" type="file" accept="image/png,image/jpeg,image/webp">
+   <span>JPG, PNG or WEBP · 1 photo</span>
+   <input id="reference" type="file"
+    accept="image/png,image/jpeg,image/webp">
   </label>
+
+  <div class="ref-tools" id="refTools">
+   <button class="small-btn" id="rotateRef">↻ Rotate</button>
+   <button class="small-btn" id="removeRef">✕ Remove photo</button>
+  </div>
+  <div class="hint">
+   Foto referensi otomatis disesuaikan ke ukuran yang didukung model.
+  </div>
  </div>
 
  <div class="grid field">
   <div>
    <label class="label" for="ratio">Aspect ratio</label>
    <input id="ratio" type="text" value="9:16"
-    placeholder="Contoh: 9:19">
+    placeholder="Contoh: 9:16">
+   <div class="hint">Masukkan rasio bebas.</div>
   </div>
+
   <div>
    <label class="label" for="quality">Image quality</label>
    <select id="quality">
     <option value="1024">1K</option>
-    <option value="2048" selected>2K</option>
-    <option value="4096">4K</option>
+    <option value="1920" selected>2K</option>
    </select>
+   <div class="hint">Maksimal 1920 px per sisi.</div>
   </div>
  </div>
 
  <div class="field">
   <label class="label">Calculated resolution</label>
-  <input id="resolutionPreview" type="text"
-   value="1152 × 2048 px" readonly>
+  <div class="resolution-grid">
+   <div>
+    <div class="hint">Width (px)</div>
+    <input id="widthPreview" type="text" readonly>
+   </div>
+   <div>
+    <div class="hint">Height (px)</div>
+    <input id="heightPreview" type="text" readonly>
+   </div>
+  </div>
+  <div class="hint" id="resolutionHint"></div>
  </div>
 
  <div class="field">
@@ -171,9 +256,20 @@ footer{text-align:center;color:#646477;font-size:11px;margin-top:35px}
  <button class="generate" id="generate">
   ✨ Generate Image
  </button>
+
+ <div class="progress-wrap" id="progressWrap">
+  <div class="progress-top">
+   <span id="progressText">Preparing...</span>
+   <span id="progressPercent">0%</span>
+  </div>
+  <div class="progress">
+   <div class="progress-bar" id="progressBar"></div>
+  </div>
+ </div>
+
  <div class="note">
-  Generation availability depends on the connected AI server
-  and its daily GPU allowance.
+  Generation uses the connected AI server. Each generated image
+  uses one model request and consumes available AI allowance.
  </div>
 </section>
 
@@ -181,200 +277,450 @@ footer{text-align:center;color:#646477;font-size:11px;margin-top:35px}
  <h2>Generated result</h2>
  <span class="muted" id="resultStatus">Waiting for generation</span>
 </div>
+
 <div class="result" id="result">
  <div class="empty">✧<br>Your generated image will appear here.</div>
 </div>
-<button class="download" id="download">↓ Download image</button>
 
 <div class="section-head">
  <h2>Recent creations</h2>
- <span class="muted">This session</span>
+ <button class="clear-history" id="clearHistory">Clear history</button>
 </div>
 <div class="gallery" id="gallery"></div>
 
 <footer>TONIC AI · Private Image Studio</footer>
 </main>
 
+<div class="modal" id="imageModal">
+ <button class="modal-close" id="closeModal">×</button>
+ <div class="modal-content">
+  <img id="modalImage" alt="Full image preview">
+  <div>
+   <button class="small-btn modal-download" id="modalDownload">
+    ↓ Download image
+   </button>
+  </div>
+ </div>
+</div>
+
 <script>
-// Isi alamat backend setelah server AI selesai dibuat.
 const API_URL = "https://tonicai.fanduepop.workers.dev/";
 
 const $ = id => document.getElementById(id);
+
 let referenceFile = null;
-let currentImageURL = null;
-let galleryURLs = [];
+let referenceRotation = 0;
+let galleryItems = [];
+let activeModalURL = null;
 
+const presets = {
+ realistic: "Photorealistic image, realistic natural skin texture, lifelike details, natural lighting.",
+ cinematic: "Cinematic photography, beautiful composition, atmospheric lighting, professional color grading.",
+ portrait: "Professional portrait photography, detailed facial features, natural skin texture, sharp focus.",
+ selfie: "Natural realistic selfie photography, authentic camera perspective, casual photographic style.",
+ studio: "Professional studio photography, controlled soft lighting, clean composition, high detail."
+};
+
+// Prompt presets
+document.querySelectorAll("[data-preset]").forEach(button => {
+ button.addEventListener("click", () => {
+  const addition = presets[button.dataset.preset];
+  const prompt = $("prompt");
+  const current = prompt.value.trim();
+
+  if (!current) {
+   prompt.value = addition;
+  } else if (!current.includes(addition)) {
+   prompt.value = current + "\n\n" + addition;
+  }
+
+  prompt.focus();
+ });
+});
+
+// Resolution calculator
 function calculateResolution() {
- const ratioText = $("ratio").value.trim();
- const quality = Number($("quality").value);
-
- const match = ratioText.match(
+ const text = $("ratio").value.trim();
+ const match = text.match(
   /^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/
  );
 
- if (!match) {
-  $("resolutionPreview").value = "Invalid aspect ratio";
-  return null;
- }
+ if (!match) return invalidRatio();
 
- const ratioWidth = Number(match[1]);
- const ratioHeight = Number(match[2]);
+ const rw = Number(match[1]);
+ const rh = Number(match[2]);
 
  if (
-  !Number.isFinite(ratioWidth) ||
-  !Number.isFinite(ratioHeight) ||
-  ratioWidth <= 0 ||
-  ratioHeight <= 0 ||
-  ratioWidth > 10000 ||
-  ratioHeight > 10000
- ) {
-  $("resolutionPreview").value = "Invalid aspect ratio";
-  return null;
+  !Number.isFinite(rw) || !Number.isFinite(rh) ||
+  rw <= 0 || rh <= 0 || rw > 10000 || rh > 10000
+ ) return invalidRatio();
+
+ const longSide = Math.max(rw, rh);
+ const shortSide = Math.min(rw, rh);
+ const target = Number($("quality").value);
+
+ // Both dimensions must be between 256 and 1920.
+ const scale = Math.max(target / longSide, 256 / shortSide);
+
+ if (longSide * scale > 1920) {
+  return invalidRatio(
+   "Rasio terlalu ekstrem. Model mendukung rasio maksimal sekitar 7.5:1."
+  );
  }
 
- // Quality represents the maximum side in pixels.
- const scale = quality / Math.max(ratioWidth, ratioHeight);
+ function roundDimension(value) {
+  return Math.min(1920, Math.max(256, Math.round(value / 8) * 8));
+ }
 
- // Round dimensions to multiples of 8 for model compatibility.
- const width = Math.max(
-  64, Math.round(ratioWidth * scale / 8) * 8
- );
- const height = Math.max(
-  64, Math.round(ratioHeight * scale / 8) * 8
- );
+ let width = roundDimension(rw * scale);
+ let height = roundDimension(rh * scale);
 
- $("resolutionPreview").value = `${width} × ${height} px`;
+ $("widthPreview").value = width;
+ $("heightPreview").value = height;
+ $("resolutionHint").textContent =
+  "Resolusi disesuaikan dengan batas model. Dimensi dibulatkan ke kelipatan 8.";
 
- return { width, height, ratio: ratioText };
+ return { width, height, ratio: rw + ":" + rh };
+}
+
+function invalidRatio(message = "Format tidak valid. Contoh: 9:16 atau 1:1.") {
+ $("widthPreview").value = "—";
+ $("heightPreview").value = "—";
+ $("resolutionHint").textContent = message;
+ return null;
 }
 
 $("ratio").addEventListener("input", calculateResolution);
 $("quality").addEventListener("change", calculateResolution);
 calculateResolution();
 
-$("reference").addEventListener("change", e => {
- referenceFile = e.target.files[0] || null;
+// Reference image preview
+function updateReferencePreview() {
  if (!referenceFile) return;
 
  const reader = new FileReader();
  reader.onload = () => {
   $("uploadText").innerHTML =
-   `<img src="${reader.result}" alt="Reference preview">`;
+   `<img src="${reader.result}" alt="Reference preview"
+   style="transform:rotate(${referenceRotation}deg)">`;
   $("uploadLabel").textContent = referenceFile.name;
  };
  reader.readAsDataURL(referenceFile);
+}
+
+$("reference").addEventListener("change", event => {
+ const file = event.target.files[0];
+
+ if (!file) return;
+
+ if (!file.type.startsWith("image/")) {
+  alert("File harus berupa gambar.");
+  event.target.value = "";
+  return;
+ }
+
+ referenceFile = file;
+ referenceRotation = 0;
+ $("refTools").style.display = "flex";
+ updateReferencePreview();
 });
 
+$("rotateRef").addEventListener("click", () => {
+ referenceRotation = (referenceRotation + 90) % 360;
+ updateReferencePreview();
+});
+
+$("removeRef").addEventListener("click", () => {
+ referenceFile = null;
+ referenceRotation = 0;
+ $("reference").value = "";
+ $("uploadText").textContent = "＋";
+ $("uploadLabel").textContent = "Upload reference photo";
+ $("refTools").style.display = "none";
+});
+
+// Resize and rotate reference to fit model requirements.
+// Cloudflare requires each reference image dimension below 512 px.
+async function prepareReference(file) {
+ const bitmap = await createImageBitmap(file);
+
+ const rotated = referenceRotation % 180 !== 0;
+ const sourceWidth = rotated ? bitmap.height : bitmap.width;
+ const sourceHeight = rotated ? bitmap.width : bitmap.height;
+
+ const scale = Math.min(510 / sourceWidth, 510 / sourceHeight, 1);
+ const width = Math.max(1, Math.round(sourceWidth * scale));
+ const height = Math.max(1, Math.round(sourceHeight * scale));
+
+ const canvas = document.createElement("canvas");
+ canvas.width = width;
+ canvas.height = height;
+
+ const ctx = canvas.getContext("2d");
+
+ ctx.translate(width / 2, height / 2);
+ ctx.rotate(referenceRotation * Math.PI / 180);
+
+ const drawWidth = rotated ? height : width;
+ const drawHeight = rotated ? width : height;
+
+ ctx.drawImage(
+  bitmap,
+  -drawWidth / 2,
+  -drawHeight / 2,
+  drawWidth,
+  drawHeight
+ );
+
+ bitmap.close();
+
+ return new Promise((resolve, reject) => {
+  canvas.toBlob(blob => {
+   if (!blob) {
+    reject(new Error("Gagal memproses foto referensi."));
+    return;
+   }
+   resolve(new File([blob], "tonic-reference.jpg", {
+    type: "image/jpeg"
+   }));
+  }, "image/jpeg", 0.90);
+ });
+}
+
+// Error response and image response handler
 async function getImage(response) {
  const type = response.headers.get("content-type") || "";
 
+ if (!response.ok) {
+  if (type.includes("application/json")) {
+   const data = await response.json();
+   throw new Error(data.error || "Server AI mengalami kesalahan.");
+  }
+  throw new Error("Server AI error: " + response.status);
+ }
+
  if (type.includes("application/json")) {
   const data = await response.json();
-  if (!data.image_url) throw new Error("Server tidak mengirim image_url.");
+  if (data.error) throw new Error(data.error);
+  if (!data.image_url) {
+   throw new Error("Server tidak mengirim gambar.");
+  }
+
   const imageResponse = await fetch(data.image_url);
   if (!imageResponse.ok) throw new Error("Gagal mengambil gambar.");
   return imageResponse.blob();
  }
 
- return response.blob();
-}
+ const blob = await response.blob();
 
-function showImage(blob) {
- const url = URL.createObjectURL(blob);
- currentImageURL = url;
+ if (!blob.type.startsWith("image/")) {
+  throw new Error("Server tidak mengembalikan file gambar.");
+ }
 
- $("result").innerHTML = "";
- const img = document.createElement("img");
- img.src = url;
- img.alt = "Generated image";
- $("result").appendChild(img);
-
- $("download").style.display = "block";
- $("download").onclick = () => downloadImage(url);
-
- galleryURLs.push(url);
- const item = document.createElement("div");
- item.className = "gallery-item";
- const thumb = document.createElement("img");
- thumb.src = url;
- thumb.alt = "Generated image";
- const caption = document.createElement("div");
- caption.textContent = "Generated image";
- item.append(thumb, caption);
- $("gallery").prepend(item);
-
- downloadImage(url);
+ return blob;
 }
 
 function downloadImage(url) {
  const a = document.createElement("a");
  a.href = url;
- a.download = `tonic-ai-${Date.now()}.png`;
+ a.download = `tonic-ai-${Date.now()}.jpg`;
  document.body.appendChild(a);
  a.click();
  a.remove();
 }
 
+// Fullscreen image preview
+function openModal(url) {
+ activeModalURL = url;
+ $("modalImage").src = url;
+ $("imageModal").classList.add("open");
+}
+
+function closeModal() {
+ $("imageModal").classList.remove("open");
+ $("modalImage").src = "";
+ activeModalURL = null;
+}
+
+$("closeModal").addEventListener("click", closeModal);
+$("imageModal").addEventListener("click", event => {
+ if (event.target === $("imageModal")) closeModal();
+});
+$("modalDownload").addEventListener("click", () => {
+ if (activeModalURL) downloadImage(activeModalURL);
+});
+
+// Display generated image
+function addGeneratedImage(blob, index) {
+ const url = URL.createObjectURL(blob);
+
+ const card = document.createElement("div");
+ card.className = "result-card";
+
+ const img = document.createElement("img");
+ img.src = url;
+ img.alt = "Generated image " + index;
+ img.addEventListener("click", () => openModal(url));
+
+ const actions = document.createElement("div");
+ actions.className = "image-actions";
+
+ const download = document.createElement("button");
+ download.className = "small-btn";
+ download.textContent = "↓ Download";
+ download.addEventListener("click", () => downloadImage(url));
+
+ const preview = document.createElement("button");
+ preview.className = "small-btn";
+ preview.textContent = "Fullscreen";
+ preview.addEventListener("click", () => openModal(url));
+
+ actions.append(download, preview);
+ card.append(img, actions);
+ $("result").appendChild(card);
+
+ galleryItems.unshift({ url, card: null });
+
+ const galleryCard = document.createElement("div");
+ galleryCard.className = "gallery-item";
+
+ const thumb = document.createElement("img");
+ thumb.src = url;
+ thumb.alt = "Recent creation";
+ thumb.addEventListener("click", () => openModal(url));
+
+ const caption = document.createElement("div");
+ caption.textContent = "Generated image";
+
+ galleryCard.append(thumb, caption);
+ $("gallery").prepend(galleryCard);
+
+ galleryItems[0].card = galleryCard;
+
+ // Keep session history manageable.
+ while (galleryItems.length > 30) {
+  const old = galleryItems.pop();
+  URL.revokeObjectURL(old.url);
+  if (old.card) old.card.remove();
+ }
+
+ return url;
+}
+
+// Progress UI
+function setProgress(done, total, message) {
+ const percent = Math.round(done / total * 100);
+ $("progressBar").style.width = percent + "%";
+ $("progressPercent").textContent = percent + "%";
+ $("progressText").textContent = message;
+}
+
+// Generate
 $("generate").addEventListener("click", async () => {
  const prompt = $("prompt").value.trim();
 
  if (!prompt) {
   alert("Masukkan prompt terlebih dahulu.");
+  $("prompt").focus();
   return;
  }
 
  const dimensions = calculateResolution();
 
  if (!dimensions) {
-  alert("Masukkan aspect ratio yang valid, contoh 9:19.");
+  alert("Periksa aspect ratio yang dimasukkan.");
   return;
  }
 
- if (API_URL === "YOUR_BACKEND_URL") {
-  alert("Backend AI belum terhubung. Kita akan memasangnya pada tahap berikutnya.");
-  return;
- }
-
+ const total = Number($("count").value);
  const button = $("generate");
+ let successful = 0;
+ let failed = false;
+
  button.disabled = true;
  button.textContent = "Generating...";
- $("resultStatus").textContent = "Processing...";
+ $("result").innerHTML = "";
+ $("resultStatus").textContent = "Preparing...";
+ $("progressWrap").style.display = "block";
+ setProgress(0, total, "Preparing generation...");
+
+ let preparedReference = null;
 
  try {
-  const form = new FormData();
-  form.append("prompt", prompt);
-  form.append("ratio", dimensions.ratio);
-  form.append("width", dimensions.width);
-  form.append("height", dimensions.height);
-  form.append("resolution", `${dimensions.width}x${dimensions.height}`);
-  form.append("quality", $("quality").value);
-  form.append("count", $("count").value);
-
-  if (referenceFile) form.append("reference", referenceFile);
-
-  const response = await fetch(API_URL + "/generate", {
-   method: "POST",
-   body: form
-  });
-
-  if (!response.ok) {
-   throw new Error("Server AI error: " + response.status);
+  if (referenceFile) {
+   setProgress(0, total, "Preparing reference photo...");
+   preparedReference = await prepareReference(referenceFile);
   }
 
-  const blob = await getImage(response);
-  if (!blob.type.startsWith("image/")) {
-   throw new Error("Format hasil bukan gambar.");
+  // Each image uses one separate Workers AI request.
+  // Sequential requests help avoid unnecessary concurrent load.
+  for (let i = 0; i < total; i++) {
+   setProgress(i, total, `Generating image ${i + 1} of ${total}...`);
+   $("resultStatus").textContent = `Generating ${i + 1}/${total}`;
+
+   const form = new FormData();
+   form.append("prompt", prompt);
+   form.append("width", String(dimensions.width));
+   form.append("height", String(dimensions.height));
+
+   if (preparedReference) {
+    form.append("reference", preparedReference);
+   }
+
+   const response = await fetch(API_URL, {
+    method: "POST",
+    body: form
+   });
+
+   const blob = await getImage(response);
+   addGeneratedImage(blob, i + 1);
+   successful++;
+
+   setProgress(successful, total, `Completed ${successful} of ${total}`);
   }
 
-  showImage(blob);
   $("resultStatus").textContent = "Completed";
+  $("progressText").textContent = "All images completed.";
+
  } catch (error) {
-  alert("Generate gagal: " + error.message);
-  $("resultStatus").textContent = "Failed";
+  failed = true;
+  $("resultStatus").textContent =
+   successful ? "Partially completed" : "Failed";
+
+  $("progressText").textContent = error.message;
+  alert(
+   (successful
+    ? successful + " gambar berhasil dibuat. "
+    : "Generate gagal. ") + error.message
+  );
+
  } finally {
   button.disabled = false;
   button.innerHTML = "✨ Generate Image";
+
+  if (!failed) {
+   setProgress(total, total, "Generation completed.");
+  }
  }
+});
+
+// Clear session history
+$("clearHistory").addEventListener("click", () => {
+ if (!galleryItems.length) return;
+
+ if (!confirm("Hapus semua riwayat gambar sesi ini?")) return;
+
+ galleryItems.forEach(item => {
+  URL.revokeObjectURL(item.url);
+  if (item.card) item.card.remove();
+ });
+
+ galleryItems = [];
+});
+
+// Escape closes fullscreen
+document.addEventListener("keydown", event => {
+ if (event.key === "Escape") closeModal();
 });
 </script>
 </body>
